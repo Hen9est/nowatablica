@@ -1,194 +1,848 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tablica Informacyjna</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #1a73e8;
-            --primary-light-color: #e8f0fe;
-            --primary-dark-color: #174ea6;
-            --danger-color: #d93025;
-            --font-color-primary: #202124;
-            --font-color-secondary: #5f6368;
-            --bg-color-main: #f8f9fa;
-            --bg-color-card: #ffffff;
-            --border-color-light: #e8eaed;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-            --border-radius-md: 8px;
-            --font-family-sans: 'Google Sans', 'Roboto', Arial, sans-serif;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Roboto', Arial, sans-serif; background-color: var(--bg-color-main); color: var(--font-color-primary); line-height: 1.5; min-height: 100vh; display: flex; flex-direction: column; }
-        .header { background: var(--bg-color-card); padding: 16px 24px; box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .header h1 { font-family: var(--font-family-sans); font-size: 24px; font-weight: 500; color: var(--primary-color); }
-        .header .datetime { font-size: 16px; color: var(--font-color-secondary); }
-        .ticker-wrapper { background: var(--primary-light-color); border-bottom: 1px solid var(--border-color-light); padding: 18px 0; overflow: hidden; white-space: nowrap; }
-        .ticker-text { display: inline-block; padding-left: 100%; animation: scroll 40s linear infinite; font-family: var(--font-family-sans); font-size: 18px; font-weight: 500; color: var(--primary-dark-color); }
-        @keyframes scroll { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
-        .content-grid { display: grid; grid-template-columns: 1fr 1fr 320px; gap: 20px; padding: 20px; flex: 1; }
-        .card { background: var(--bg-color-card); border-radius: var(--border-radius-md); box-shadow: var(--shadow-sm); overflow: hidden; display: flex; flex-direction: column; max-height: calc(100vh - 180px); }
-        .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border-color-light); display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-        .card-header h2 { font-family: var(--font-family-sans); font-size: 18px; font-weight: 500; }
-        .card-header .icon { width: 24px; height: 24px; fill: var(--font-color-secondary); }
-        .card-body { flex: 1; overflow-y: auto; }
-        .substitutes-content, .announcements-content, .duties-body { padding: 0; }
-        .substitute-table { width: 100%; border-collapse: collapse; }
-        .substitute-table th, .substitute-table td { padding: 12px 8px; text-align: left; border-bottom: 1px solid var(--border-color-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14px; }
-        .substitute-table th { font-size: 12px; font-weight: 700; color: var(--font-color-secondary); text-transform: uppercase; background: var(--bg-color-main); position: sticky; top: 0; }
-        .substitute-table tr:hover { background-color: var(--primary-light-color); }
-        .substituting-teacher { font-weight: 700; }
-        .announcements-content { padding: 8px 16px; }
-        .announcement-item { padding: 16px; margin-bottom: 12px; background: var(--bg-color-main); border-radius: var(--border-radius-md); border: 1px solid var(--border-color-light); }
-        .announcement-title { font-weight: 500; margin-bottom: 8px; font-size: 16px; }
-        .announcement-content { color: var(--font-color-secondary); font-size: 14px; }
-        .duties-column { grid-column: 3 / 4; }
-        .duties-body { padding: 12px; }
-        .duties-day-info { background: var(--primary-light-color); padding: 12px; border-radius: var(--border-radius-md); margin-bottom: 16px; text-align: center; }
-        .duties-day-info h3 { font-family: var(--font-family-sans); font-size: 16px; color: var(--primary-color); }
-        .duties-break-group { margin-bottom: 16px; }
-        .duties-break-title { font-family: var(--font-family-sans); font-size: 13px; font-weight: 500; margin-bottom: 8px; padding: 6px 10px; background: var(--bg-color-main); border-radius: 4px; text-align: center; }
-        .duties-location-card { border: 1px solid var(--border-color-light); border-radius: var(--border-radius-md); margin-bottom: 8px; }
-        .duties-location-header { padding: 8px 12px; }
-        .duties-location-header h4 { font-size: 13px; font-weight: 500; }
-        .duties-teachers { padding: 0 12px 8px; font-size: 12px; color: var(--font-color-secondary); }
-        .loading, .error, .empty-state { text-align: center; padding: 40px; color: var(--font-color-secondary); font-style: italic; }
-        .error { color: var(--danger-color); font-weight: 500; }
-        @media (max-width: 1024px) { .content-grid { grid-template-columns: 1fr 1fr; } .duties-column { grid-column: 1 / -1; order: 3; } }
-        @media (max-width: 768px) { .content-grid { grid-template-columns: 1fr; } .header { flex-direction: column; align-items: flex-start; } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tablica Szkolna</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0f1117;
+    --bg2: #181c27;
+    --bg3: #1f2435;
+    --border: rgba(255,255,255,0.07);
+    --text: #f0f2f8;
+    --muted: rgba(240,242,248,0.45);
+    --accent: #f5c542;
+    --accent2: #5b8dee;
+    --green: #3ecf8e;
+    --red: #f06060;
+    --radius: 20px;
+    --font: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── VIEWS ── */
+  #app { width: 100vw; height: 100vh; position: relative; }
+
+  .view {
+    position: absolute; inset: 0;
+    opacity: 0; pointer-events: none;
+    transition: opacity .7s ease;
+  }
+  .view.active { opacity: 1; pointer-events: all; }
+
+  /* ── VIEW A: ZEGAR + SZCZĘŚLIWY NUMER ── */
+  #view-a {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    padding: 0;
+  }
+
+  #panel-clock {
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: flex-start;
+    padding: 6vw 5vw 6vw 6vw;
+    border-right: 1px solid var(--border);
+    background: var(--bg);
+    gap: 1.5vh;
+  }
+
+  #dayofweek {
+    font-size: clamp(14px, 1.6vw, 28px);
+    font-weight: 400;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .15em;
+  }
+
+  #current-date {
+    font-size: clamp(18px, 2.2vw, 38px);
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -.01em;
+  }
+
+  #current-time {
+    font-family: var(--mono);
+    font-size: clamp(52px, 9vw, 148px);
+    font-weight: 400;
+    color: var(--text);
+    letter-spacing: -.04em;
+    line-height: 1;
+    margin-top: 1vh;
+  }
+
+  #time-dot {
+    display: inline-block;
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+  #vacation-box {
+    margin-top: 3vh;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  #vacation-label {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .15em;
+  }
+  #vacation-count {
+    display: flex; align-items: baseline; gap: .35em;
+  }
+  #vacation-days {
+    font-family: var(--mono);
+    font-size: clamp(28px, 4vw, 64px);
+    font-weight: 400;
+    color: var(--accent2);
+    line-height: 1;
+  }
+  #vacation-unit {
+    font-size: clamp(14px, 1.4vw, 22px);
+    color: var(--muted);
+    font-weight: 400;
+  }
+  #vacation-bar-wrap {
+    width: clamp(120px, 16vw, 280px);
+    height: 4px;
+    background: rgba(255,255,255,.07);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  #vacation-bar {
+    height: 100%;
+    background: var(--accent2);
+    border-radius: 2px;
+    transition: width 1s ease;
+  }
+
+  #panel-lucky {
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    padding: 6vw 5vw;
+    background: var(--bg2);
+    gap: 2.5vh;
+  }
+
+  .lucky-label {
+    font-size: clamp(12px, 1.2vw, 20px);
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .2em;
+  }
+
+  #lucky-number {
+    font-family: var(--mono);
+    font-size: clamp(80px, 16vw, 240px);
+    font-weight: 400;
+    color: var(--accent);
+    line-height: 1;
+    letter-spacing: -.05em;
+    display: block;
+    opacity: 1;
+  }
+
+  #lucky-number.animate {
+    animation: popIn .45s cubic-bezier(.175,.885,.32,1.275);
+  }
+  @keyframes popIn {
+    0% { transform: scale(.7); }
+    100% { transform: scale(1); }
+  }
+
+  #dice-row {
+    display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+    max-width: 260px;
+  }
+
+  .dice {
+    width: 44px; height: 44px;
+    background: var(--bg3);
+    border: 1.5px solid rgba(245,197,66,.25);
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    grid-template-rows: repeat(3,1fr);
+    padding: 5px;
+    gap: 0;
+  }
+  .dot {
+    width: 7px; height: 7px;
+    background: var(--accent);
+    border-radius: 50%;
+    align-self: center; justify-self: center;
+  }
+  .dice.value-1 .dot { grid-area: 2/2; }
+  .dice.value-2 .dot:nth-child(1){grid-area:1/1} .dice.value-2 .dot:nth-child(2){grid-area:3/3}
+  .dice.value-3 .dot:nth-child(1){grid-area:1/1} .dice.value-3 .dot:nth-child(2){grid-area:2/2} .dice.value-3 .dot:nth-child(3){grid-area:3/3}
+  .dice.value-4 .dot:nth-child(1){grid-area:1/1} .dice.value-4 .dot:nth-child(2){grid-area:1/3} .dice.value-4 .dot:nth-child(3){grid-area:3/1} .dice.value-4 .dot:nth-child(4){grid-area:3/3}
+  .dice.value-5 .dot:nth-child(1){grid-area:1/1} .dice.value-5 .dot:nth-child(2){grid-area:1/3} .dice.value-5 .dot:nth-child(3){grid-area:2/2} .dice.value-5 .dot:nth-child(4){grid-area:3/1} .dice.value-5 .dot:nth-child(5){grid-area:3/3}
+  .dice.value-6 .dot:nth-child(1){grid-area:1/1} .dice.value-6 .dot:nth-child(2){grid-area:1/3} .dice.value-6 .dot:nth-child(3){grid-area:2/1} .dice.value-6 .dot:nth-child(4){grid-area:2/3} .dice.value-6 .dot:nth-child(5){grid-area:3/1} .dice.value-6 .dot:nth-child(6){grid-area:3/3}
+
+  /* ── VIEW B: CZY WIESZ ── */
+  #view-b {
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    padding: 5vw;
+    gap: 3.5vh;
+    background: var(--bg);
+  }
+
+  #fact-eyebrow {
+    font-size: 30px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: .2em;
+    color: var(--muted);
+  }
+
+  #fact-year-pill {
+    display: inline-block;
+    background: var(--accent2);
+    color: #fff;
+    font-size: 30px;
+    font-weight: 600;
+    padding: .35em .9em;
+    border-radius: 100px;
+    letter-spacing: .02em;
+  }
+
+  #fact-body {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4vw;
+    max-width: 88vw;
+  }
+
+  #fact-img {
+    width: clamp(140px, 18vw, 280px);
+    height: clamp(120px, 16vw, 240px);
+    object-fit: cover;
+    border-radius: 14px;
+    background: var(--bg3);
+    flex-shrink: 0;
+    display: none;
+  }
+
+  #fact-text {
+    font-size: clamp(22px, 3.4vw, 60px);
+    font-weight: 400;
+    line-height: 1.25;
+    color: var(--text);
+    text-wrap: pretty;
+    max-width: 62vw;
+  }
+
+  /* Progress bar */
+  #progress-bar {
+    position: fixed;
+    bottom: 0; left: 0;
+    height: 3px;
+    background: var(--accent2);
+    width: 0%;
+    transition: width linear;
+    z-index: 100;
+  }
+
+  /* Gear button */
+  #gear-btn {
+    position: fixed; top: 20px; right: 20px;
+    z-index: 200;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    width: 44px; height: 44px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    transition: color .2s, background .2s;
+  }
+  #gear-btn:hover { color: var(--text); background: var(--bg2); }
+  #gear-btn svg { width: 20px; height: 20px; fill: currentColor; }
+
+  /* View indicator dots */
+  #dots {
+    position: fixed; bottom: 18px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; gap: 8px;
+    z-index: 100;
+  }
+  .dot-ind {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background .3s;
+  }
+  .dot-ind.on { background: var(--muted); }
+
+  /* ── EDITOR ── */
+  #editor-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.75);
+    backdrop-filter: blur(8px);
+    z-index: 500;
+    display: none;
+    align-items: center; justify-content: center;
+  }
+  #editor-box {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 32px;
+    width: 92%;
+    max-width: 640px;
+    max-height: 88vh;
+    overflow-y: auto;
+    display: flex; flex-direction: column; gap: 20px;
+  }
+  .ed-head {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .ed-head h2 { font-size: 18px; font-weight: 600; }
+  .ed-close {
+    background: var(--bg3); border: none; border-radius: 10px;
+    width: 34px; height: 34px; color: var(--text); cursor: pointer;
+    font-size: 16px; display: flex; align-items: center; justify-content: center;
+  }
+  .ed-selectors { display: flex; gap: 10px; }
+  .ed-selectors select {
+    flex: 1; background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 14px;
+    color: var(--text); font-family: var(--font); font-size: 14px;
+    cursor: pointer;
+  }
+  .ed-fact {
+    background: var(--bg3);
+    border-left: 3px solid var(--accent2);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .ed-fact label { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 600; }
+  .ed-fact input, .ed-fact textarea {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px;
+    color: var(--text); font-family: var(--font); font-size: 13px;
+    width: 100%;
+  }
+  .ed-fact textarea { height: 52px; resize: none; }
+  .ed-ai { font-size: 11px; color: var(--green); font-style: italic; }
+  .ed-save {
+    background: var(--accent2); color: #fff;
+    border: none; border-radius: 12px;
+    padding: 14px; font-family: var(--font);
+    font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: opacity .2s;
+  }
+  .ed-save:hover { opacity: .85; }
+
+  /* tweaks panel */
+  #tweaks-panel {
+    display: none;
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 18px; padding: 20px;
+    z-index: 300; width: 240px;
+    flex-direction: column; gap: 14px;
+  }
+  #tweaks-panel h3 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+  .tweak-row { display: flex; flex-direction: column; gap: 6px; }
+  .tweak-row label { font-size: 12px; color: var(--muted); }
+  .tweak-row input[type=range] { width: 100%; accent-color: var(--accent2); }
+  .tweak-row select {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 10px; color: var(--text);
+    font-family: var(--font); font-size: 13px;
+  }
+</style>
+<template id="__bundler_thumbnail" data-bg-color="#1a0a2e">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#1a0a2e"/>
+    <rect x="0" y="0" width="600" height="800" fill="#120820"/>
+    <text x="80" y="260" font-family="monospace" font-size="180" fill="white" opacity="0.9">08:30</text>
+    <text x="80" y="340" font-family="monospace" font-size="36" fill="white" opacity="0.4">PONIEDZIAŁEK</text>
+    <text x="1060" y="180" font-family="monospace" font-size="22" fill="#f06060" opacity="0.7" text-anchor="middle">SZCZĘŚLIWY</text>
+    <text x="1060" y="320" font-family="monospace" font-size="240" fill="#f5c542" text-anchor="middle" opacity="0.95">9</text>
+    <rect x="80" y="560" width="300" height="4" rx="2" fill="#f06060" opacity="0.3"/>
+    <rect x="80" y="560" width="200" height="4" rx="2" fill="#f06060"/>
+  </svg>
+</template>
 </head>
 <body>
-    <header class="header">
-        <h1 id="school-name">Tablica Informacyjna</h1>
-        <div class="datetime" id="datetime"></div>
-    </header>
-    <div class="ticker-wrapper">
-        <div class="ticker-text" id="ticker-text">Ładowanie...</div>
+
+<div id="app">
+  <!-- VIEW A: ZEGAR + LICZBA -->
+  <div id="view-a" class="view active" data-screen-label="Zegar i Szczęśliwy Numer">
+    <div id="panel-clock">
+      <div id="dayofweek">Poniedziałek</div>
+      <div id="current-date">20 Kwietnia 2026</div>
+      <div id="current-time"><span id="time-h">00</span><span id="time-dot">:</span><span id="time-m">00</span><span style="opacity:.5">:</span><span id="time-s" style="font-size:.55em;opacity:.5;vertical-align:middle">00</span></div>
+      <div id="vacation-box">
+        <div id="vacation-label">Do wakacji</div>
+        <div id="vacation-count">
+          <span id="vacation-days">—</span>
+          <span id="vacation-unit">dni</span>
+        </div>
+        <div id="vacation-bar-wrap"><div id="vacation-bar" style="width:0%"></div></div>
+      </div>
     </div>
-    <div class="content-grid">
-        <div class="card">
-            <div class="card-header"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg><h2>Zastępstwa na dziś</h2></div>
-            <div class="card-body"><div class="substitutes-content" id="substitutes-content"><div class="loading">Ładowanie...</div></div></div>
-        </div>
-        <div class="card">
-            <div class="card-header"><svg class="icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 12h-2v-2h2v2zm0-4h-2V6h2v4z"/></svg><h2>Ogłoszenia</h2></div>
-            <div class="card-body"><div class="announcements-content" id="announcements-content"><div class="loading">Ładowanie...</div></div></div>
-        </div>
-        <div class="card duties-column">
-            <div class="card-header"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.2 14.2L11 13V7h1.5v5.2l4.5 2.7-.8 1.3z"/></svg><h2>Dyżury nauczycieli</h2></div>
-            <div class="card-body"><div class="duties-body" id="duties-content"><div class="loading">Ładowanie...</div></div></div>
-        </div>
+    <div id="panel-lucky">
+      <div class="lucky-label">Szczęśliwy numer</div>
+      <div id="lucky-number">?</div>
+      <div id="dice-row"></div>
     </div>
-    <script>
-        // WAŻNE: Wklej tutaj swój NOWY adres URL, który otrzymałeś po ponownym wdrożeniu skryptu!
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8duLSxi2hKUnWsfyfNbiVA0Yr-ZQW8VbFc0eaeD3tJyKr6dLKUlx148uKYgbncF4u/exec';
-        const REFRESH_INTERVAL = 300000; // 5 minut
+  </div>
 
-        async function fetchSheetData(action) {
-            // Dodajemy unikalny parametr, aby uniknąć problemów z pamięcią podręczną
-            const url = `${APPS_SCRIPT_URL}?action=${action}&cachebust=${new Date().getTime()}`;
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error(`Błąd sieci: ${response.status}`);
-                const jsonResponse = await response.json();
-                if (jsonResponse.error) throw new Error(`Błąd serwera: ${jsonResponse.error}`);
-                return jsonResponse.data || [];
-            } catch (error) {
-                console.error(`Błąd podczas pobierania danych dla akcji '${action}':`, error);
-                return []; // Zwróć pustą tablicę, aby uniknąć dalszych błędów
-            }
-        }
+  <!-- VIEW B: CZY WIESZ -->
+  <div id="view-b" class="view" data-screen-label="Czy Wiesz Że">
+    <div id="fact-eyebrow">Czy wiesz, że w</div>
+    <div id="fact-year-pill">?</div>
+    <div id="fact-body">
+      <img id="fact-img" src="" alt="">
+      <div id="fact-text"></div>
+    </div>
+  </div>
+</div>
 
-        function updateDateTime() {
-            document.getElementById('datetime').textContent = new Date().toLocaleDateString('pl-PL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-        }
+<!-- PROGRESS BAR -->
+<div id="progress-bar"></div>
 
-        async function loadConfiguration() {
-            const data = await fetchSheetData('getConfiguration');
-            // Przekształca tablicę klucz-wartość w obiekt dla łatwiejszego dostępu
-            const config = data.reduce((acc, item) => ({ ...acc, [item.Klucz]: item.Wartość }), {});
-            document.getElementById('school-name').textContent = config['Nazwa Szkoły'] || 'Tablica Informacyjna';
-            document.getElementById('ticker-text').textContent = config['Pasek Informacyjny'] || 'Brak komunikatów';
-        }
+<!-- DOTS -->
+<div id="dots">
+  <div class="dot-ind on" id="dot-a"></div>
+  <div class="dot-ind" id="dot-b"></div>
+</div>
 
-        async function loadSubstitutes() {
-            const container = document.getElementById('substitutes-content');
-            const data = await fetchSheetData('getSubstitutes');
-            if (data.length === 0) {
-                container.innerHTML = '<div class="empty-state">Brak zastępstw</div>';
-                return;
-            }
-            // Upewnij się, że te nagłówki odpowiadają nazwom kolumn w Twoim Arkuszu
-            const headers = ['Godzina lekcyjna', 'Za kogo', 'Kto zastępuje', 'Klasa', 'Uwagi'];
-            let html = '<table class="substitute-table"><thead><tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr></thead><tbody>';
-            data.forEach(row => {
-                if (row['Za kogo'] && row['Kto zastępuje']) {
-                    html += `<tr>` + headers.map(h => `<td class="${h === 'Kto zastępuje' ? 'substituting-teacher' : ''}">${row[h] || '-'}</td>`).join('') + `</tr>`;
-                }
-            });
-            container.innerHTML = html + '</tbody></table>';
-        }
+<!-- GEAR -->
+<button id="gear-btn" title="Edytor wydarzeń">
+  <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+</button>
 
-        async function loadAnnouncements() {
-            const container = document.getElementById('announcements-content');
-            const data = await fetchSheetData('getAnnouncements');
-            if (data.length === 0) {
-                container.innerHTML = '<div class="empty-state">Brak ogłoszeń</div>';
-                return;
-            }
-            container.innerHTML = data.map(ann => ann['Tytuł'] && ann['Treść'] ? `<div class="announcement-item"><div class="announcement-title">${ann['Tytuł']}</div><div class="announcement-content">${ann['Treść']}</div></div>` : '').join('');
-        }
+<!-- TWEAKS -->
+<div id="tweaks-panel">
+  <h3>Tweaks</h3>
+  <div class="tweak-row">
+    <label>Czas wyświetlania (sek)</label>
+    <input type="range" id="tweak-duration" min="5" max="30" step="1" value="12">
+    <span id="tweak-dur-val" style="font-size:12px;color:var(--muted)">12s</span>
+  </div>
+  <div class="tweak-row">
+    <label>Kolor akcentu</label>
+    <select id="tweak-accent">
+      <option value="#5b8dee">Niebieski</option>
+      <option value="#3ecf8e">Zielony</option>
+      <option value="#f06060">Czerwony</option>
+      <option value="#c084fc">Fioletowy</option>
+      <option value="#fb923c">Pomarańczowy</option>
+    </select>
+  </div>
+  <div class="tweak-row">
+    <label>Tło</label>
+    <select id="tweak-bg">
+      <option value="#0f1117">Bardzo ciemne</option>
+      <option value="#111827">Ciemne (szary)</option>
+      <option value="#0d1b2a">Granatowe</option>
+      <option value="#1a0a2e">Fioletowe</option>
+    </select>
+  </div>
+</div>
 
-        async function loadDuties() {
-            const container = document.getElementById('duties-content');
-            const data = await fetchSheetData('getDuties');
-            const today = new Date();
-            const currentDayName = today.toLocaleDateString('pl-PL', { weekday: 'long' }).toLowerCase();
-            const todayDuties = data.filter(d => d['Dzień tygodnia']?.toLowerCase() === currentDayName);
+<!-- EDITOR -->
+<div id="editor-overlay">
+  <div id="editor-box">
+    <div class="ed-head">
+      <h2>Edytor Wydarzeń 2026</h2>
+      <button class="ed-close" id="ed-close">✕</button>
+    </div>
+    <div class="ed-selectors">
+      <select id="sel-month">
+        <option value="01">Styczeń</option><option value="02">Luty</option>
+        <option value="03">Marzec</option><option value="04">Kwiecień</option>
+        <option value="05">Maj</option><option value="06">Czerwiec</option>
+        <option value="07">Lipiec</option><option value="08">Sierpień</option>
+        <option value="09">Wrzesień</option><option value="10">Październik</option>
+        <option value="11">Listopad</option><option value="12">Grudzień</option>
+      </select>
+      <select id="sel-day"></select>
+    </div>
+    <div id="ed-list"></div>
+    <button class="ed-save" id="ed-save">Zapisz zmiany</button>
+  </div>
+</div>
 
-            if (todayDuties.length === 0) {
-                container.innerHTML = `<div class="empty-state">Brak dyżurów na dziś</div>`;
-                return;
-            }
+<script>
+// ── DATABASE ──
+let DB = {
+    "01-07": [{y:"1610",t:"Galileusz odkrył 4 największe księżyce Jowisza. Udowodnił, że nie wszystko w kosmosie krąży wokół Ziemi!",img:"https://commons.wikimedia.org/wiki/Special:FilePath/Justus_Sustermans_-_Portrait_of_Galileo_Galilei,_1636.jpg?width=300"},{y:"1785",t:"Pierwszy lot balonem nad morzem (Kanał La Manche). Pokazano, że człowiek potrafi latać między krajami.",img:"https://commons.wikimedia.org/wiki/Special:FilePath/Blanchard_crossing_English_Channel.jpg?width=300"},{y:"1882",t:"Jan Matejko został członkiem paryskiej Akademii. Jego obrazy rozsławiły Polskę w całej Europie.",img:"https://commons.wikimedia.org/wiki/Special:FilePath/Matejko_Self-portrait.jpg?width=300"}],
+    "01-08": [{y:"1942",t:"Urodził się Stephen Hawking. Badał czarne dziury, mimo że prawie całe życie spędził na wózku.",img:"https://commons.wikimedia.org/wiki/Special:FilePath/Stephen_Hawking.StarChild.jpg?width=300"},{y:"1747",t:"Otwarto Bibliotekę Załuskich w Warszawie. To była jedna z pierwszych bibliotek narodowych na świecie!",img:"https://commons.wikimedia.org/wiki/Special:FilePath/Biblioteka_Zaluskich_Warszawa_1.jpg?width=300"}],
+    "01-09": [{y:"1890",t:"Urodził się Karel Čapek. To on wymyślił słowo ROBOT, by opisać mechaniczne postacie pomagające ludziom.",img:"https://commons.wikimedia.org/wiki/Special:FilePath/Karel_Capek_1930s.jpg?width=300"},{y:"1839",t:"Wynaleziono dagerotyp – prababcię aparatu. Po raz pierwszy w historii można było zrobić trwałe zdjęcie!",img:"https://commons.wikimedia.org/wiki/Special:FilePath/Louis_Daguerre_2.jpg?width=300"},{y:"1993",t:"Pierwszy finał Wielkiej Orkiestry Świątecznej Pomocy. Polacy zaczęli wspólnie pomagać chorym dzieciom.",img:""}],
+    "01-12": [{y:"1896",t:"W Niemczech wykonano pierwsze w historii zdjęcie rentgenowskie. Lekarz zobaczył kości dłoni bez nacinania skóry!",img:""},{y:"1628",t:"Urodził się Charles Perrault, autor słynnych bajek, m.in. o Czerwonym Kapturku.",img:""}],
+    "01-13": [{y:"1910",t:"Pierwsza publiczna transmisja radiowa. Ludzie mogli usłyszeć muzykę w swoim domu przez radio!",img:""},{y:"1957",t:"Opatentowano FRISBEE – prosta zabawka (latający talerz), która podbiła światowe parki.",img:""}],
+    "01-14": [{y:"1899",t:"W Łodzi otwarto pierwsze stałe kino w Polsce. Nazywało się 'Teatr Żywych Fotografii'.",img:""},{y:"2005",t:"Europejska sonda Huygens wylądowała na Tytanie (księżycu Saturna). To najdalsze lądowanie maszyny w historii.",img:"https://commons.wikimedia.org/wiki/Special:FilePath/Huygens_on_Titan_surface.jpg?width=300"}],
+    "01-15": [{y:"2001",t:"Narodziny Wikipedii! Darmowej encyklopedii, którą każdy może współtworzyć.",img:"https://commons.wikimedia.org/wiki/Special:FilePath/Wikipedia-logo-v2.svg?width=300"},{y:"1759",t:"Otwarcie British Museum w Londynie. Można tam zobaczyć skarby z całego świata.",img:""}],
+    "01-16": [{y:"1919",t:"Słynny pianista Ignacy Jan Paderewski został premierem Polski. Łączył świat wielkiej muzyki z polityką.",img:"https://commons.wikimedia.org/wiki/Special:FilePath/Ignacy_Jan_Paderewski_1910s.jpg?width=300"},{y:"1976",t:"Europejski samolot naddźwiękowy CONCORDE ruszył w pierwszy lot pasażerski. Latał szybciej niż dźwięk!",img:""}],
+    "01-19": [{y:"1892",t:"Urodził się Stefan Banach. Genialny polski matematyk, którego odkrycia zna każdy naukowiec na świecie.",img:"https://commons.wikimedia.org/wiki/Special:FilePath/Stefan_Banach.jpg?width=300"},{y:"1736",t:"Urodził się James Watt ze Szkocji. Udoskonalił silnik parowy i zmienił cały przemysł.",img:""}],
+    "01-20": [{y:"1817",t:"W Warszawie powstała Giełda Kupiecka. Kupcy ustalali tam ceny towarów dla całego kraju.",img:""},{y:"1930",t:"Urodził się Buzz Aldrin, drugi człowiek w historii, który postawił stopę na Księżycu.",img:"https://commons.wikimedia.org/wiki/Special:FilePath/Buzz_Aldrin.jpg?width=300"}],
+    "01-21": [{y:"1976",t:"Europejski samolot naddźwiękowy CONCORDE ruszył w pierwszy lot pasażerski. Latał szybciej niż dźwięk!",img:""},{y:"1954",t:"Wodowanie Nautilusa – pierwszego na świecie okrętu podwodnego napędzanego bezpieczną energią atomową.",img:""}],
+    "01-22": [{y:"1863",t:"Wybuch Powstania Styczniowego w Polsce. Polacy dzielnie walczyli o wolność przeciwko Rosji.",img:"https://commons.wikimedia.org/wiki/Special:FilePath/Grottger_Bitwa.jpg?width=300"},{y:"1775",t:"Urodził się André Ampère. To od jego nazwiska jednostka prądu nazywa się AMPER.",img:""}],
+    "01-23": [{y:"1932",t:"Urodził się Ryszard Kapuściński. Słynny polski reporter, który zwiedził i opisał cały świat.",img:""},{y:"1960",t:"Jacques Piccard dotarł na dno Rowu Mariańskiego (11 km pod wodą!). Wytrzymał tam ogromne ciśnienie.",img:""}],
+    "01-26": [{y:"1926",t:"Pierwszy pokaz telewizji. John Baird pokazał, jak przesyłać ruchomy obraz na odległość.",img:""},{y:"1905",t:"Odkryto Cullinan – największy diament świata. Ważył ponad pół kilograma!",img:""}],
+    "01-27": [{y:"1756",t:"Urodził się Wolfgang Amadeusz Mozart. Był muzycznym geniuszem, który pisał utwory już jako 5-latek!",img:""},{y:"1945",t:"Wyzwolenie obozu Auschwitz. Pamiętamy o ofiarach wojny na całym świecie.",img:"https://commons.wikimedia.org/wiki/Special:FilePath/Auschwitz_I_Gate_Memo.jpg?width=300"}],
+    "01-28": [{y:"1958",t:"W Danii opatentowano klocki LEGO. Ich nazwa oznacza 'Baw się dobrze' (z duńskiego Leg Godt).",img:""},{y:"1611",t:"Urodził się Jan Heweliusz z Gdańska. Jako pierwszy astronom stworzył dokładne mapy powierzchni Księżyca.",img:""},{y:"1886",t:"Karl Benz patentuje pierwszy samochód. Jechał z prędkością 16 km/h – wolniej niż biegnący człowiek!",img:""}],
+    "01-29": [{y:"1962",t:"Urodziła się Olga Tokarczuk, polska pisarka, laureatka Nagrody Nobla.",img:""},{y:"1887",t:"Ukazała się pierwsza opowieść o Sherlocku Holmesie – najsłynniejszym detektywie świata.",img:""}],
+    "01-30": [{y:"1995",t:"Marek Kamiński zdobył samotnie Biegun Północny. To pierwszy taki wyczyn Polaka w mroźnych lodach.",img:""},{y:"1882",t:"Urodził się Franklin Roosevelt, prezydent, który pomógł światu wyjść z ogromnego kryzysu.",img:""}],
+    "02-02": [{y:"1943",t:"Urodziła się Wanda Rutkiewicz. Jedna z najwybitniejszych himalaistek świata, zdobywczyni Mount Everestu.",img:""},{y:"1971",t:"Podpisano konwencję RAMSAR o ochronie mokradeł i ptaków na całym świecie.",img:""}],
+    "02-03": [{y:"1916",t:"Polak Jan Czochralski odkrył metodę tworzenia kryształów. Bez tego nie byłoby dzisiejszych smartfonów!",img:"https://commons.wikimedia.org/wiki/Special:FilePath/Jan_Czochralski.jpg?width=300"},{y:"1966",t:"Sonda Luna 9 wykonała pierwsze 'miękkie' lądowanie na Księżycu.",img:""}],
+    "02-04": [{y:"1746",t:"Urodził się Tadeusz Kościuszko. Wielki bohater Polski i Ameryki.",img:"https://commons.wikimedia.org/wiki/Special:FilePath/Tadeusz_Kosciuszko.jpg?width=300"},{y:"2004",t:"Narodziny Facebooka. Serwis, który miał służyć studentom, połączył miliardy ludzi.",img:""}],
+    "02-05": [{y:"1928",t:"Powstanie Biblioteki Narodowej w Warszawie. Skarbnica polskiej literatury.",img:""},{y:"1870",t:"Pierwsza masowa produkcja gumy do żucia. Ludzie zaczęli żuć dla zabawy i oddechu.",img:""}],
+    "02-06": [{y:"1905",t:"W Zakopanem odbyły się pierwsze zawody w skokach narciarskich. Początek wielkiej pasji Polaków.",img:""},{y:"1935",t:"Opatentowano grę MONOPOLY. Najpopularniejsza gra planszowa świata.",img:""},{y:"1952",t:"Elżbieta II została królową Wielkiej Brytanii. Rządziła aż 70 lat!",img:""}],
+    "02-09": [{y:"1969",t:"Pierwszy lot Boeinga 747 (Jumbo Jet). To był największy samolot pasażerski tamtych czasów.",img:""},{y:"2000",t:"Premiera gry The Sims. Ludzie zaczęli opiekować się wirtualnymi postaciami.",img:""}],
+    "02-10": [{y:"1920",t:"Zaślubiny Polski z Morzem. Generał Haller wrzucił pierścień do Bałtyku.",img:"https://commons.wikimedia.org/wiki/Special:FilePath/Zaślubiny_Polski_z_morzem_1920_Kossak.jpg?width=300"},{y:"1926",t:"Gdynia otrzymała prawa miejskie. Z małej wioski stała się nowoczesnym portem.",img:""}],
+    "02-11": [{y:"1966",t:"Premiera komiksu Tytus, Romek i A'Tomek. Polskie dzieci pokochały przygody szympansa.",img:""},{y:"1847",t:"Urodził się Thomas Edison. Wynalazca, który dał nam światło elektryczne.",img:""},{y:"2016",t:"Potwierdzono fale grawitacyjne – przestrzeń kosmiczna faluje jak woda!",img:""}],
+    "02-12": [{y:"1809",t:"Urodził się Karol Darwin. Dzięki niemu wiemy, jak zmieniają się zwierzęta i ludzie.",img:""}],
+    "02-17": [{y:"1980",t:"Polacy Wielicki i Cichy jako pierwsi zdobyli Mount Everest zimą! To był rekord świata.",img:""},{y:"ŚW.",t:"Europejski Dzień Kota. Świętujemy obecność naszych mruczących przyjaciół.",img:""}],
+    "02-18": [{y:"1930",t:"Odkrycie PLUTONA. Przez lata uważany za planetę, dziś za planetę karłowatą.",img:""},{y:"2021",t:"Łazik Perseverance wylądował na Marsie, by szukać tam śladów życia.",img:""}],
+    "02-19": [{y:"1473",t:"Urodziny Kopernika w Toruniu. Polak udowodnił, że to Ziemia krąży wokół Słońca.",img:""},{y:"1878",t:"Edison patentuje fonograf – pierwsze urządzenie do nagrywania piosenek.",img:""}],
+    "02-20": [{y:"1862",t:"Powstanie Muzeum Narodowego w Warszawie. Największy skarbiec polskiej sztuki.",img:""},{y:"1962",t:"John Glenn pierwszym Amerykaninem na orbicie. Okrążył Ziemię w małej kapsule.",img:""}],
+    "02-24": [{y:"1896",t:"Pierwszy pokaz filmu w Warszawie. Polacy zobaczyli 'żywe zdjęcia' braci Lumiere.",img:""},{y:"1955",t:"Urodził się Steve Jobs, twórca iPhone'a i wielkiej potęgi firmy Apple.",img:""}],
+    "02-25": [{y:"1936",t:"Urodziła się Anna German. Polska piosenkarka o anielskim głosie, znana w całej Europie.",img:""},{y:"1950",t:"Powstała Unia Nadawców EBU – to oni organizują co roku konkurs Eurowizji.",img:""}],
+    "02-26": [{y:"1927",t:"Mazurek Dąbrowskiego hymnem Polski. Ta pieśń dawała nam siłę w trudnych chwilach.",img:""}],
+    "02-27": [{y:"1897",t:"Urodził się Kazimierz Nowak. Jako pierwszy człowiek na świecie przejechał Afrykę na rowerze!",img:""},{y:"1932",t:"Odkrycie NEUTRONU – małej części atomu. Naukowcy zrozumieli budowę materii.",img:""}],
+    "03-02": [{y:"1969",t:"Lot samolotu CONCORDE. Ten naddźwiękowy ptak latał z Europy do USA szybciej niż dźwięk!",img:""},{y:"1972",t:"Sonda Pioneer 10 ruszyła w stronę Jowisza. Niosła wiadomość od Ziemian.",img:""}],
+    "03-03": [{y:"1847",t:"Urodził się Alexander Graham Bell, wynalazca telefonu. Połączył ludzi na odległość.",img:""},{y:"1989",t:"Premiera gry Tetris na konsolę Game Boy. Podbiła serca dzieci na całym świecie.",img:""}],
+    "03-05": [{y:"1979",t:"Sonda Voyager minęła Jowisza. Zrobiła zdjęcia planety i jej dziwnych księżyców.",img:""},{y:"1475",t:"Urodził się Michał Anioł. Genialny rzeźbiarz, malarz i architekt renesansu.",img:""}],
+    "03-06": [{y:"1899",t:"Opatentowano ASPIRYNĘ – lek na gorączkę i ból używany do dziś na całym świecie.",img:""},{y:"1851",t:"Karol Wedel otworzył w Warszawie swoją pierwszą cukiernię. Początek pysznych słodyczy.",img:""}],
+    "03-09": [{y:"1959",t:"Lalka BARBIE zadebiutowała na targach w Nowym Jorku. Stała się najsłynniejszą zabawką świata.",img:""},{y:"1934",t:"Urodził się Jurij Gagarin – pierwszy człowiek, który poleciał w kosmos.",img:""}],
+    "03-10": [{y:"1876",t:"Pierwsza rozmowa telefoniczna: 'Panie Watson, proszę tu przyjść, potrzebuję pana!'.",img:""},{y:"1948",t:"Urodził się Jerzy Kukuczka, polski król wysokich gór. Zdobył Koronę Himalajów.",img:""}],
+    "03-12": [{y:"1989",t:"Tim Berners-Lee zaproponował system WWW. Tak narodziły się współczesne strony internetowe.",img:""},{y:"1999",t:"Polska dołączyła do NATO – sojuszu dbającego o nasze bezpieczeństwo.",img:""}],
+    "03-13": [{y:"1781",t:"William Herschel odkrył planetę URAN. Nasz Układ Słoneczny stał się większy.",img:""}],
+    "03-16": [{y:"1926",t:"Robert Goddard wystrzelił pierwszą rakietę na paliwo płynne. Początek ery lotów kosmicznych.",img:""},{y:"1966",t:"Pierwsze dokowanie dwóch pojazdów w kosmosie. Misja Gemini 8 z Neilem Armstrongiem.",img:""}],
+    "03-18": [{y:"1965",t:"Spacer w kosmosie Aleksieja Leonowa. Unosił się swobodnie w próżni kosmicznej!",img:""},{y:"1858",t:"Urodził się Rudolf Diesel. Wynalazł silnik napędzający dziś ciężarówki i statki.",img:""}],
+    "03-19": [{y:"1895",t:"Bracia Lumière pokazali swój pierwszy film. To oficjalne narodziny kina na świecie.",img:""},{y:"1845",t:"Opatentowano GUMKĘ RECEPTURKĘ. Taka mała rzecz, a jak bardzo ułatwia życie!",img:""}],
+    "03-20": [{y:"1642",t:"Urodził się Isaac Newton. Odkrył prawo grawitacji – wyjaśnił, dlaczego jabłka spadają.",img:""},{y:"WIO.",t:"Pierwszy dzień wiosny! Przyroda budzi się do życia, a dni są coraz dłuższe.",img:""},{y:"1916",t:"Powstanie Legii Warszawa – jednego z najsłynniejszych polskich klubów piłkarskich.",img:""}],
+    "03-23": [{y:"1839",t:"Pierwsze użycie zwrotu 'OK' w gazecie. Dziś to najpopularniejsze słowo na świecie.",img:""},{y:"1857",t:"Pierwsza winda osobowa ruszyła w Nowym Jorku. Budynki mogły stać się wyższe.",img:""}],
+    "03-24": [{y:"1882",t:"Robert Koch odkrył bakterię gruźlicy. Lekarze mogli wreszcie zacząć leczyć tę chorobę.",img:""}],
+    "03-25": [{y:"1655",t:"Odkrycie Tytana (księżyca Saturna). Dziś wiemy, że są tam jeziora z gazu.",img:""},{y:"1957",t:"Początek Unii Europejskiej – kraje Europy zaczęły współpracować zamiast walczyć.",img:""}],
+    "03-26": [{y:"1946",t:"Urodził się Jan Miodek. Słynny profesor uczy nas pięknej mowy polskiej.",img:""}],
+    "03-27": [{y:"1901",t:"Pierwsza Nagroda Nobla za promienie X. Lekarze mogli zajrzeć pod skórę pacjenta.",img:""}],
+    "03-30": [{y:"1853",t:"Urodził się Vincent van Gogh. Choć za życia nikt go nie cenił, dziś to król malarstwa.",img:"https://upload.wikimedia.org/wikipedia/commons/4/4c/Vincent_van_Gogh_-_Self-Portrait_-_Google_Art_Project_%28454045%29.jpg"},{y:"1842",t:"Pierwsze użycie znieczulenia przy operacji. Pacjent przestał czuć ból!",img:""}],
+    "03-31": [{y:"1889",t:"Otwarcie WIEŻY EIFFLA w Paryżu. Symbol Francji i całej Europy.",img:"https://upload.wikimedia.org/wikipedia/commons/8/85/Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg"},{y:"1596",t:"Urodził się Kartezjusz, ojciec układu współrzędnych, którego używasz w szkole.",img:""}],
+    "04-01": [{y:"1976",t:"Start firmy Apple. Steve Jobs stworzył komputery, które zmieniły naszą zabawę i naukę.",img:"https://upload.wikimedia.org/wikipedia/commons/a/a1/Apple_I_Computer.jpg"},{y:"1960",t:"Wystrzelono pierwszego satelitę pogodowego TIROS-1. Zobaczyliśmy pogodę z góry!",img:""}],
+    "04-02": [{y:"1805",t:"Urodził się Hans Christian Andersen – król bajek, m.in. o Brzydkim Kaczątku.",img:"https://upload.wikimedia.org/wikipedia/commons/d/d4/Hans_Christian_Andersen_1869.jpg"},{y:"1968",t:"Premiera filmu '2001: Odyseja kosmiczna'. Pokazał ludziom jak może wyglądać przyszłość.",img:""}],
+    "04-03": [{y:"1973",t:"Wykonano PIERWSZĄ ROZMOWĘ PRZEZ TELEFON KOMÓRKOWY. Telefon był wielki i ciężki jak cegła!",img:"https://upload.wikimedia.org/wikipedia/commons/a/ae/DynaTAC8000X.jpg"}],
+    "04-08": [{y:"1911",t:"Odkrycie nadprzewodnictwa – zjawiska, dzięki któremu działają bardzo szybkie pociągi.",img:""},{y:"XII w.",t:"Symboliczna data otwarcia kopalni soli w Wieliczce. Polskie białe złoto.",img:"https://upload.wikimedia.org/wikipedia/commons/9/90/Wieliczka_Salt_Mine_St_Kinga_Chapel.jpg"}],
+    "04-10": [{y:"1912",t:"Titanic ruszył w swój pierwszy i ostatni rejs z Anglii w stronę Ameryki.",img:"https://upload.wikimedia.org/wikipedia/commons/f/fd/RMS_Titanic_3.jpg"},{y:"2019",t:"Pokazano pierwsze w historii zdjęcie CZARNEJ DZIURY. Wyglądała jak ognisty pierścień.",img:"https://upload.wikimedia.org/wikipedia/commons/4/42/Black_hole_-_Messier_87_crop_max_res.jpg"}],
+    "04-12": [{y:"1961",t:"Jurij Gagarin pierwszym człowiekiem w kosmosie. Jego podróż trwała 108 minut.",img:"https://upload.wikimedia.org/wikipedia/commons/c/cc/Yuri_Gagarin.jpg"},{y:"1981",t:"Pierwszy lot promu Columbia. Pojazdu, który wracał na Ziemię jak szybowiec.",img:""}],
+    "04-15": [{y:"1452",t:"Urodził się Leonardo da Vinci. Genialny malarz i wynalazca wyprzedzający swoje czasy o setki lat.",img:"https://upload.wikimedia.org/wikipedia/commons/b/ba/Leonardo_self.jpg"}],
+    "04-20": [{y:"1902",t:"Maria i Piotr Curie wyizolowali rad. To odkrycie zmieniło naukę i medycynę na zawsze.",img:"https://upload.wikimedia.org/wikipedia/commons/7/71/Marie_Curie_c1900.jpg"},{y:"1841",t:"Opublikowano pierwszy nowoczesny kryminał (Edgar Allan Poe).",img:"https://upload.wikimedia.org/wikipedia/commons/7/75/Edgar_Allan_Poe_2.jpg"}],
+    "04-22": [{y:"ŚW.",t:"DZIEŃ ZIEMI! Ludzie na całym globie sprzątają lasy i uczą się jak dbać o naszą planetę.",img:"https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg"},{y:"1994",t:"Zakończono budowę Eurotunelu pod morzem, łączącego pociągiem Francję z Anglią.",img:""}],
+    "04-24": [{y:"1990",t:"Teleskop Hubble'a poleciał w kosmos. Dzięki niemu zobaczyliśmy najdalsze zakątki wszechświata.",img:"https://upload.wikimedia.org/wikipedia/commons/3/3f/HST-SM4.jpeg"}],
+    "04-30": [{y:"1777",t:"Urodził się Karol Gauss, 'Książę Matematyków'. Jako dziecko sumował liczby błyskawicznie w pamięci.",img:""},{y:"1993",t:"CERN ogłosił, że internet (WWW) będzie darmowy dla wszystkich. Dlatego teraz to czytasz!",img:""}]
+};
 
-            const dutiesByBreak = todayDuties.reduce((acc, duty) => {
-                const breakNum = duty['Przerwa'];
-                if (!acc[breakNum]) acc[breakNum] = [];
-                acc[breakNum].push(duty);
-                return acc;
-            }, {});
+// Merge localStorage overrides
+const saved = localStorage.getItem('school_db');
+if (saved) { try { Object.assign(DB, JSON.parse(saved)); } catch(e){} }
 
-            let html = `<div class="duties-day-info"><h3>${currentDayName.charAt(0).toUpperCase() + currentDayName.slice(1)}</h3><p>${today.toLocaleDateString('pl-PL')}</p></div>`;
-            for (const breakNum in dutiesByBreak) {
-                html += `<div class="duties-break-group"><div class="duties-break-title">Przerwa ${breakNum}</div>`;
-                dutiesByBreak[breakNum].forEach(duty => {
-                    Object.keys(duty).filter(key => key.toLowerCase().includes('sektor') && duty[key]).forEach(key => {
-                        const color = key.toLowerCase().includes('pomarańczowy') ? '#fff3cd' : key.toLowerCase().includes('zielony') ? '#d4edda' : key.toLowerCase().includes('czerwony') ? '#f8d7da' : '#f0f0f0';
-                        html += `<div class="duties-location-card"><div class="duties-location-header" style="background-color:${color};"><h4>${key}</h4></div><div class="duties-teachers">${duty[key]}</div></div>`;
-                    });
-                });
-                html += `</div>`;
-            }
-            container.innerHTML = html;
-        }
-        
-        async function refreshAllData() {
-            console.log("Rozpoczynam odświeżanie danych...");
-            await Promise.all([loadConfiguration(), loadSubstitutes(), loadAnnouncements(), loadDuties()]);
-            console.log("Wszystkie dane zostały załadowane.");
-        }
+// Tweaks persistence
+const TWEAKS_DEF = /*EDITMODE-BEGIN*/{
+  "duration": 12,
+  "accent": "#f06060",
+  "bg": "#1a0a2e"
+}/*EDITMODE-END*/;
+let tweaks = { ...TWEAKS_DEF };
+try { const t = JSON.parse(localStorage.getItem('school_tweaks')||'{}'); Object.assign(tweaks, t); } catch(e){}
 
-        document.addEventListener('DOMContentLoaded', () => {
-            updateDateTime();
-            setInterval(updateDateTime, 60000); // Aktualizuj czas co minutę
-            refreshAllData();
-            setInterval(refreshAllData, REFRESH_INTERVAL);
-        });
-    </script>
+function applyTweaks() {
+  document.documentElement.style.setProperty('--accent2', tweaks.accent);
+  document.documentElement.style.setProperty('--bg', tweaks.bg);
+  document.getElementById('tweak-duration').value = tweaks.duration;
+  document.getElementById('tweak-dur-val').textContent = tweaks.duration + 's';
+  document.getElementById('tweak-accent').value = tweaks.accent;
+  document.getElementById('tweak-bg').value = tweaks.bg;
+  VIEW_DURATION = tweaks.duration * 1000;
+}
+
+// ── LUCKY NUMBER ──
+const BAGS = [
+  [3,5,17,1,9,14,6,8,12,4,10,15,2,13,7,11,18,16],
+  [10,4,15,2,13,7,1,18,9,16,5,11,17,3,8,14,6,12],
+  [7,14,2,16,9,12,5,1,11,17,3,10,6,15,18,4,13,8],
+  [16,6,13,8,3,18,10,2,15,5,1,14,9,11,4,17,7,12],
+  [5,12,17,4,11,8,15,7,2,13,9,1,18,6,10,16,3,14],
+  [9,1,14,6,10,16,3,13,4,17,7,12,15,2,11,18,8,5],
+  [2,15,8,11,4,7,13,18,6,10,16,3,14,9,1,12,5,17],
+  [14,3,10,12,5,17,7,4,13,9,1,18,2,8,15,6,11,16],
+  [11,16,6,1,8,15,9,3,12,14,17,5,13,7,2,10,18,4],
+  [4,18,7,13,2,10,1,16,8,15,6,11,12,5,17,9,14,3]
+];
+const START = new Date('2025-10-25T00:00:00Z');
+
+function getLucky() {
+  const now = new Date();
+  const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  const startUTC = Date.UTC(START.getFullYear(), START.getMonth(), START.getDate());
+  let d = Math.floor((todayUTC - startUTC) / 86400000);
+  if (d < 0) d = (d % 180 + 180) % 180;
+  return BAGS[Math.floor((d % 180) / 18)][d % 18];
+}
+
+function renderDice(n) {
+  const row = document.getElementById('dice-row');
+  row.innerHTML = '';
+  let rem = n;
+  while (rem > 0) {
+    const v = Math.min(rem, 6); rem -= v;
+    const d = document.createElement('div');
+    d.className = `dice value-${v}`;
+    for (let i = 0; i < v; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      d.appendChild(dot);
+    }
+    row.appendChild(d);
+  }
+}
+
+function updateLucky() {
+  const n = getLucky();
+  const el = document.getElementById('lucky-number');
+  el.textContent = n;
+  el.classList.remove('animate');
+  void el.offsetWidth;
+  el.classList.add('animate');
+  renderDice(n);
+}
+
+// ── CLOCK ──
+function updateClock() {
+  const now = new Date();
+  const h = now.getHours().toString().padStart(2,'0');
+  const m = now.getMinutes().toString().padStart(2,'0');
+  const s = now.getSeconds().toString().padStart(2,'0');
+  document.getElementById('time-h').textContent = h;
+  document.getElementById('time-m').textContent = m;
+  document.getElementById('time-s').textContent = s;
+  document.getElementById('current-date').textContent = now.toLocaleDateString('pl-PL', {day:'numeric', month:'long', year:'numeric'});
+  document.getElementById('dayofweek').textContent = now.toLocaleDateString('pl-PL', {weekday:'long'});
+}
+
+// ── FACTS ──
+let factEvents = [], factIdx = 0;
+
+function initFacts() {
+  const now = new Date();
+  const key = `${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getDate().toString().padStart(2,'0')}`;
+  const dw = now.getDay();
+  if (dw === 0 || dw === 6) {
+    factEvents = [{y:'WEEKEND', t:'Dziś sobota lub niedziela! Czas na odpoczynek i dobrą zabawę.', img:''}];
+  } else {
+    factEvents = DB[key] || [{y:'2026', t:'Każdy dzień roku 2026 to szansa na odkrycie czegoś nowego!', img:''}];
+  }
+  factIdx = 0;
+}
+
+function renderFact() {
+  if (!factEvents.length) return;
+  const ev = factEvents[factIdx];
+  const special = ['WEEKEND','ŚW.','WIO.'].includes(ev.y);
+  document.getElementById('fact-eyebrow').textContent = special ? 'Czy wiesz, że' : 'Czy wiesz, że w';
+  document.getElementById('fact-year-pill').textContent = ev.y + (!special && /^\d+$/.test(ev.y) ? ' roku' : '');
+  document.getElementById('fact-text').textContent = ev.t;
+  const img = document.getElementById('fact-img');
+  if (ev.img) {
+    img.src = ev.img;
+    img.style.display = 'block';
+    img.onerror = () => { img.style.display = 'none'; };
+  } else {
+    img.style.display = 'none';
+  }
+  factIdx = (factIdx + 1) % factEvents.length;
+}
+
+// ── VIEW SWITCHING ──
+let currentView = 'a';
+let VIEW_DURATION = tweaks.duration * 1000;
+let progressInterval, switchTimeout;
+
+function startProgress(duration) {
+  const bar = document.getElementById('progress-bar');
+  bar.style.transition = 'none';
+  bar.style.width = '0%';
+  void bar.offsetWidth;
+  bar.style.transition = `width ${duration}ms linear`;
+  bar.style.width = '100%';
+}
+
+function switchView() {
+  const va = document.getElementById('view-a');
+  const vb = document.getElementById('view-b');
+  const da = document.getElementById('dot-a');
+  const db = document.getElementById('dot-b');
+
+  if (currentView === 'a') {
+    renderFact();
+    va.classList.remove('active'); vb.classList.add('active');
+    da.classList.remove('on'); db.classList.add('on');
+    currentView = 'b';
+  } else {
+    updateLucky();
+    vb.classList.remove('active'); va.classList.add('active');
+    db.classList.remove('on'); da.classList.add('on');
+    currentView = 'a';
+  }
+  startProgress(VIEW_DURATION);
+  switchTimeout = setTimeout(switchView, VIEW_DURATION);
+}
+
+// ── EDITOR ──
+const overlay = document.getElementById('editor-overlay');
+const selM = document.getElementById('sel-month');
+const selD = document.getElementById('sel-day');
+
+function populateDays() {
+  const days = new Date(2026, parseInt(selM.value), 0).getDate();
+  selD.innerHTML = '';
+  for (let i = 1; i <= days; i++) selD.add(new Option(i, i.toString().padStart(2,'0')));
+}
+
+function loadEditor() {
+  const key = `${selM.value}-${selD.value}`;
+  const data = DB[key] || [{y:'',t:'',img:''},{y:'',t:'',img:''},{y:'',t:'',img:''}];
+  const list = document.getElementById('ed-list');
+  list.innerHTML = '';
+  data.slice(0,3).forEach((ev, i) => {
+    const div = document.createElement('div');
+    div.className = 'ed-fact';
+    div.innerHTML = `
+      <label>Fakt ${i+1}</label>
+      <input class="ey" placeholder="Rok / skrót" value="${ev.y||''}">
+      <textarea class="et" placeholder="Treść ciekawostki...">${ev.t||''}</textarea>
+      <input class="ei" placeholder="URL obrazka (opcjonalnie)" value="${ev.img||''}">
+    `;
+    list.appendChild(div);
+  });
+}
+
+document.getElementById('gear-btn').onclick = () => {
+  const now = new Date();
+  selM.value = (now.getMonth()+1).toString().padStart(2,'0');
+  populateDays();
+  selD.value = now.getDate().toString().padStart(2,'0');
+  loadEditor();
+  overlay.style.display = 'flex';
+};
+document.getElementById('ed-close').onclick = () => overlay.style.display = 'none';
+overlay.onclick = e => { if (e.target === overlay) overlay.style.display = 'none'; };
+selM.onchange = () => { populateDays(); loadEditor(); };
+selD.onchange = loadEditor;
+
+document.getElementById('ed-save').onclick = () => {
+  const key = `${selM.value}-${selD.value}`;
+  const ey = document.querySelectorAll('.ey');
+  const et = document.querySelectorAll('.et');
+  const ei = document.querySelectorAll('.ei');
+  const res = [];
+  for (let i = 0; i < ey.length; i++) {
+    if (ey[i].value || et[i].value) res.push({y: ey[i].value, t: et[i].value, img: ei[i].value});
+  }
+  DB[key] = res;
+  const overrides = JSON.parse(localStorage.getItem('school_db') || '{}');
+  overrides[key] = res;
+  localStorage.setItem('school_db', JSON.stringify(overrides));
+  initFacts();
+  overlay.style.display = 'none';
+};
+
+// ── TWEAKS UI ──
+window.addEventListener('message', e => {
+  if (e.data?.type === '__activate_edit_mode') document.getElementById('tweaks-panel').style.display = 'flex';
+  if (e.data?.type === '__deactivate_edit_mode') document.getElementById('tweaks-panel').style.display = 'none';
+});
+window.parent.postMessage({type:'__edit_mode_available'},'*');
+
+function saveTweaks() {
+  localStorage.setItem('school_tweaks', JSON.stringify(tweaks));
+  window.parent.postMessage({type:'__edit_mode_set_keys', edits: tweaks}, '*');
+}
+
+document.getElementById('tweak-duration').oninput = function() {
+  tweaks.duration = parseInt(this.value);
+  document.getElementById('tweak-dur-val').textContent = this.value + 's';
+  VIEW_DURATION = tweaks.duration * 1000;
+  clearTimeout(switchTimeout);
+  startProgress(VIEW_DURATION);
+  switchTimeout = setTimeout(switchView, VIEW_DURATION);
+  saveTweaks();
+};
+document.getElementById('tweak-accent').onchange = function() {
+  tweaks.accent = this.value;
+  document.documentElement.style.setProperty('--accent2', this.value);
+  saveTweaks();
+};
+document.getElementById('tweak-bg').onchange = function() {
+  tweaks.bg = this.value;
+  document.documentElement.style.setProperty('--bg', this.value);
+  saveTweaks();
+};
+
+// ── VACATION COUNTDOWN ──
+const VACATION_START = new Date('2026-06-20T00:00:00'); // Pierwszy dzień wakacji
+const SCHOOL_START   = new Date('2026-09-01T00:00:00'); // Powrót do szkoły
+
+function updateVacation() {
+  const now = new Date();
+  const msDay = 86400000;
+
+  // If it's vacation time already
+  if (now >= VACATION_START && now < SCHOOL_START) {
+    document.getElementById('vacation-label').textContent = 'Wakacje!';
+    document.getElementById('vacation-days').textContent = '🏖';
+    document.getElementById('vacation-unit').textContent = '';
+    document.getElementById('vacation-bar').style.width = '100%';
+    return;
+  }
+
+  // Count days to vacation
+  const target = now < VACATION_START ? VACATION_START : VACATION_START;
+  const daysLeft = Math.ceil((target - now) / msDay);
+
+  // Progress: school year starts Sept 1, ends June 20 (~293 days)
+  const yearLen = (VACATION_START - SCHOOL_START) / msDay + 365; // approx
+  const elapsed = (now - new Date('2025-09-01T00:00:00')) / msDay;
+  const pct = Math.min(100, Math.max(0, (elapsed / (293)) * 100));
+
+  document.getElementById('vacation-label').textContent = 'Do wakacji';
+  document.getElementById('vacation-days').textContent = daysLeft;
+  document.getElementById('vacation-unit').textContent = daysLeft === 1 ? 'dzień' : 'dni';
+  document.getElementById('vacation-bar').style.width = pct.toFixed(1) + '%';
+}
+
+// ── INIT ──
+applyTweaks();
+updateClock();
+updateVacation();
+updateLucky();
+initFacts();
+setInterval(() => { updateClock(); updateVacation(); }, 1000);
+startProgress(VIEW_DURATION);
+switchTimeout = setTimeout(switchView, VIEW_DURATION);
+</script>
 </body>
 </html>
