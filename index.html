@@ -194,72 +194,6 @@
   .dice.value-5 .dot:nth-child(1){grid-area:1/1} .dice.value-5 .dot:nth-child(2){grid-area:1/3} .dice.value-5 .dot:nth-child(3){grid-area:2/2} .dice.value-5 .dot:nth-child(4){grid-area:3/1} .dice.value-5 .dot:nth-child(5){grid-area:3/3}
   .dice.value-6 .dot:nth-child(1){grid-area:1/1} .dice.value-6 .dot:nth-child(2){grid-area:1/3} .dice.value-6 .dot:nth-child(3){grid-area:2/1} .dice.value-6 .dot:nth-child(4){grid-area:2/3} .dice.value-6 .dot:nth-child(5){grid-area:3/1} .dice.value-6 .dot:nth-child(6){grid-area:3/3}
 
-  /* ── VIEW B: CZY WIESZ ── */
-  #view-b {
-    display: flex; flex-direction: column;
-    justify-content: center; align-items: center;
-    padding: 5vw;
-    gap: 3.5vh;
-    background: var(--bg);
-  }
-
-  #fact-eyebrow {
-    font-size: 30px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: .2em;
-    color: var(--muted);
-  }
-
-  #fact-year-pill {
-    display: inline-block;
-    background: var(--accent2);
-    color: #fff;
-    font-size: 30px;
-    font-weight: 600;
-    padding: .35em .9em;
-    border-radius: 100px;
-    letter-spacing: .02em;
-  }
-
-  #fact-body {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 4vw;
-    max-width: 88vw;
-  }
-
-  #fact-img {
-    width: clamp(140px, 18vw, 280px);
-    height: clamp(120px, 16vw, 240px);
-    object-fit: cover;
-    border-radius: 14px;
-    background: var(--bg3);
-    flex-shrink: 0;
-    display: none;
-  }
-
-  #fact-text {
-    font-size: clamp(22px, 3.4vw, 60px);
-    font-weight: 400;
-    line-height: 1.25;
-    color: var(--text);
-    text-wrap: pretty;
-    max-width: 62vw;
-  }
-
-  /* Progress bar */
-  #progress-bar {
-    position: fixed;
-    bottom: 0; left: 0;
-    height: 3px;
-    background: var(--accent2);
-    width: 0%;
-    transition: width linear;
-    z-index: 100;
-  }
-
   /* Gear button */
   #gear-btn {
     position: fixed; top: 20px; right: 20px;
@@ -275,21 +209,6 @@
   }
   #gear-btn:hover { color: var(--text); background: var(--bg2); }
   #gear-btn svg { width: 20px; height: 20px; fill: currentColor; }
-
-  /* View indicator dots */
-  #dots {
-    position: fixed; bottom: 18px; left: 50%;
-    transform: translateX(-50%);
-    display: flex; gap: 8px;
-    z-index: 100;
-  }
-  .dot-ind {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--border);
-    transition: background .3s;
-  }
-  .dot-ind.on { background: var(--muted); }
 
   /* ── EDITOR ── */
   #editor-overlay {
@@ -409,24 +328,6 @@
     </div>
   </div>
 
-  <!-- VIEW B: CZY WIESZ -->
-  <div id="view-b" class="view" data-screen-label="Czy Wiesz Że">
-    <div id="fact-eyebrow">Czy wiesz, że w</div>
-    <div id="fact-year-pill">?</div>
-    <div id="fact-body">
-      <img id="fact-img" src="" alt="">
-      <div id="fact-text"></div>
-    </div>
-  </div>
-</div>
-
-<!-- PROGRESS BAR -->
-<div id="progress-bar"></div>
-
-<!-- DOTS -->
-<div id="dots">
-  <div class="dot-ind on" id="dot-a"></div>
-  <div class="dot-ind" id="dot-b"></div>
 </div>
 
 <!-- GEAR -->
@@ -437,11 +338,6 @@
 <!-- TWEAKS -->
 <div id="tweaks-panel">
   <h3>Tweaks</h3>
-  <div class="tweak-row">
-    <label>Czas wyświetlania (sek)</label>
-    <input type="range" id="tweak-duration" min="5" max="30" step="1" value="12">
-    <span id="tweak-dur-val" style="font-size:12px;color:var(--muted)">12s</span>
-  </div>
   <div class="tweak-row">
     <label>Kolor akcentu</label>
     <select id="tweak-accent">
@@ -562,7 +458,6 @@ if (saved) { try { Object.assign(DB, JSON.parse(saved)); } catch(e){} }
 
 // Tweaks persistence
 const TWEAKS_DEF = /*EDITMODE-BEGIN*/{
-  "duration": 12,
   "accent": "#f06060",
   "bg": "#1a0a2e"
 }/*EDITMODE-END*/;
@@ -572,11 +467,8 @@ try { const t = JSON.parse(localStorage.getItem('school_tweaks')||'{}'); Object.
 function applyTweaks() {
   document.documentElement.style.setProperty('--accent2', tweaks.accent);
   document.documentElement.style.setProperty('--bg', tweaks.bg);
-  document.getElementById('tweak-duration').value = tweaks.duration;
-  document.getElementById('tweak-dur-val').textContent = tweaks.duration + 's';
   document.getElementById('tweak-accent').value = tweaks.accent;
   document.getElementById('tweak-bg').value = tweaks.bg;
-  VIEW_DURATION = tweaks.duration * 1000;
 }
 
 // ── LUCKY NUMBER ──
@@ -643,74 +535,6 @@ function updateClock() {
   document.getElementById('dayofweek').textContent = now.toLocaleDateString('pl-PL', {weekday:'long'});
 }
 
-// ── FACTS ──
-let factEvents = [], factIdx = 0;
-
-function initFacts() {
-  const now = new Date();
-  const key = `${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getDate().toString().padStart(2,'0')}`;
-  const dw = now.getDay();
-  if (dw === 0 || dw === 6) {
-    factEvents = [{y:'WEEKEND', t:'Dziś sobota lub niedziela! Czas na odpoczynek i dobrą zabawę.', img:''}];
-  } else {
-    factEvents = DB[key] || [{y:'2026', t:'Każdy dzień roku 2026 to szansa na odkrycie czegoś nowego!', img:''}];
-  }
-  factIdx = 0;
-}
-
-function renderFact() {
-  if (!factEvents.length) return;
-  const ev = factEvents[factIdx];
-  const special = ['WEEKEND','ŚW.','WIO.'].includes(ev.y);
-  document.getElementById('fact-eyebrow').textContent = special ? 'Czy wiesz, że' : 'Czy wiesz, że w';
-  document.getElementById('fact-year-pill').textContent = ev.y + (!special && /^\d+$/.test(ev.y) ? ' roku' : '');
-  document.getElementById('fact-text').textContent = ev.t;
-  const img = document.getElementById('fact-img');
-  if (ev.img) {
-    img.src = ev.img;
-    img.style.display = 'block';
-    img.onerror = () => { img.style.display = 'none'; };
-  } else {
-    img.style.display = 'none';
-  }
-  factIdx = (factIdx + 1) % factEvents.length;
-}
-
-// ── VIEW SWITCHING ──
-let currentView = 'a';
-let VIEW_DURATION = tweaks.duration * 1000;
-let progressInterval, switchTimeout;
-
-function startProgress(duration) {
-  const bar = document.getElementById('progress-bar');
-  bar.style.transition = 'none';
-  bar.style.width = '0%';
-  void bar.offsetWidth;
-  bar.style.transition = `width ${duration}ms linear`;
-  bar.style.width = '100%';
-}
-
-function switchView() {
-  const va = document.getElementById('view-a');
-  const vb = document.getElementById('view-b');
-  const da = document.getElementById('dot-a');
-  const db = document.getElementById('dot-b');
-
-  if (currentView === 'a') {
-    renderFact();
-    va.classList.remove('active'); vb.classList.add('active');
-    da.classList.remove('on'); db.classList.add('on');
-    currentView = 'b';
-  } else {
-    updateLucky();
-    vb.classList.remove('active'); va.classList.add('active');
-    db.classList.remove('on'); da.classList.add('on');
-    currentView = 'a';
-  }
-  startProgress(VIEW_DURATION);
-  switchTimeout = setTimeout(switchView, VIEW_DURATION);
-}
-
 // ── EDITOR ──
 const overlay = document.getElementById('editor-overlay');
 const selM = document.getElementById('sel-month');
@@ -766,7 +590,6 @@ document.getElementById('ed-save').onclick = () => {
   const overrides = JSON.parse(localStorage.getItem('school_db') || '{}');
   overrides[key] = res;
   localStorage.setItem('school_db', JSON.stringify(overrides));
-  initFacts();
   overlay.style.display = 'none';
 };
 
@@ -782,15 +605,6 @@ function saveTweaks() {
   window.parent.postMessage({type:'__edit_mode_set_keys', edits: tweaks}, '*');
 }
 
-document.getElementById('tweak-duration').oninput = function() {
-  tweaks.duration = parseInt(this.value);
-  document.getElementById('tweak-dur-val').textContent = this.value + 's';
-  VIEW_DURATION = tweaks.duration * 1000;
-  clearTimeout(switchTimeout);
-  startProgress(VIEW_DURATION);
-  switchTimeout = setTimeout(switchView, VIEW_DURATION);
-  saveTweaks();
-};
 document.getElementById('tweak-accent').onchange = function() {
   tweaks.accent = this.value;
   document.documentElement.style.setProperty('--accent2', this.value);
@@ -839,10 +653,7 @@ applyTweaks();
 updateClock();
 updateVacation();
 updateLucky();
-initFacts();
 setInterval(() => { updateClock(); updateVacation(); }, 1000);
-startProgress(VIEW_DURATION);
-switchTimeout = setTimeout(switchView, VIEW_DURATION);
 </script>
 </body>
 </html>
