@@ -320,12 +320,12 @@
       <div id="current-date">20 Kwietnia 2026</div>
       <div id="current-time"><span id="time-h">00</span><span id="time-dot">:</span><span id="time-m">00</span><span style="opacity:.5">:</span><span id="time-s" style="font-size:.55em;opacity:.5;vertical-align:middle">00</span></div>
       <div id="vacation-box">
-        <div id="vacation-label">Do wakacji</div>
+        <div id="vacation-label">Do końca roku szkolnego</div>
         <div id="vacation-count">
           <span id="vacation-days">—</span>
           <span id="vacation-unit">dni</span>
         </div>
-        <div id="vacation-end-date">26 czerwca 2026</div>
+        <div id="vacation-end-date">Koniec roku szkolnego: 26 czerwca 2026</div>
         <div id="vacation-bar-wrap"><div id="vacation-bar" style="width:0%"></div></div>
       </div>
     </div>
@@ -659,7 +659,7 @@ function updateVacation() {
   document.getElementById('vacation-label').textContent = 'Do końca roku szkolnego';
   document.getElementById('vacation-days').textContent = daysLeft;
   document.getElementById('vacation-unit').textContent = daysLeft === 1 ? 'dzień' : 'dni';
-  document.getElementById('vacation-end-date').textContent = 'Koniec roku: ' + SCHOOL_YEAR_END.toLocaleDateString('pl-PL', {
+  document.getElementById('vacation-end-date').textContent = 'Koniec roku szkolnego: ' + SCHOOL_YEAR_END.toLocaleDateString('pl-PL', {
     day: 'numeric',
     month: 'long',
     year: 'numeric'
