@@ -656,7 +656,7 @@ function updateVacation() {
   const elapsed = calendarDaysBetween(SCHOOL_YEAR_START, today);
   const pct = Math.min(100, Math.max(0, (elapsed / yearLen) * 100));
 
-  document.getElementById('vacation-label').textContent = 'Do końca roku';
+  document.getElementById('vacation-label').textContent = 'Do końca roku szkolnego';
   document.getElementById('vacation-days').textContent = daysLeft;
   document.getElementById('vacation-unit').textContent = daysLeft === 1 ? 'dzień' : 'dni';
   document.getElementById('vacation-end-date').textContent = 'Koniec roku: ' + SCHOOL_YEAR_END.toLocaleDateString('pl-PL', {
