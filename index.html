@@ -655,7 +655,7 @@ function updateVacation() {
     return;
   }
 
-  const daysLeft = Math.max(0, calendarDaysBetween(today, VACATION_START));
+  const daysLeft = Math.max(0, calendarDaysBetween(today, VACATION_START) - 1);
 
   const yearLen = calendarDaysBetween(SCHOOL_YEAR_START, VACATION_START);
   const elapsed = calendarDaysBetween(SCHOOL_YEAR_START, today);
