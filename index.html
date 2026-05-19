@@ -22,6 +22,7 @@
     --radius: 20px;
     --font: 'DM Sans', sans-serif;
     --mono: 'DM Mono', monospace;
+    --bottom-safe-margin: 30px;
   }
 
   html, body {
@@ -33,7 +34,11 @@
   }
 
   /* ── VIEWS ── */
-  #app { width: 100vw; height: 100vh; position: relative; }
+  #app {
+    width: 100vw;
+    height: calc(100vh - var(--bottom-safe-margin));
+    position: relative;
+  }
 
   .view {
     position: absolute; inset: 0;
@@ -320,12 +325,12 @@
       <div id="current-date">20 Kwietnia 2026</div>
       <div id="current-time"><span id="time-h">00</span><span id="time-dot">:</span><span id="time-m">00</span><span style="opacity:.5">:</span><span id="time-s" style="font-size:.55em;opacity:.5;vertical-align:middle">00</span></div>
       <div id="vacation-box">
-        <div id="vacation-label">Do końca roku szkolnego</div>
+        <div id="vacation-label">Do wakacji</div>
         <div id="vacation-count">
           <span id="vacation-days">—</span>
           <span id="vacation-unit">dni</span>
         </div>
-        <div id="vacation-end-date">Koniec roku szkolnego: 26 czerwca 2026</div>
+        <div id="vacation-end-date">Wakacje od: 26 czerwca 2026</div>
         <div id="vacation-bar-wrap"><div id="vacation-bar" style="width:0%"></div></div>
       </div>
     </div>
@@ -624,9 +629,9 @@ document.getElementById('tweak-bg').onchange = function() {
   saveTweaks();
 };
 
-// ── SCHOOL YEAR COUNTDOWN ──
+// ── VACATION COUNTDOWN ──
 const SCHOOL_YEAR_START = new Date(2025, 8, 1);
-const SCHOOL_YEAR_END = new Date(2026, 5, 26);
+const VACATION_START = new Date(2026, 5, 26);
 const NEXT_SCHOOL_YEAR_START = new Date(2026, 8, 1);
 
 function dateOnly(date) {
@@ -641,25 +646,25 @@ function updateVacation() {
   const now = new Date();
   const today = dateOnly(now);
 
-  if (today > SCHOOL_YEAR_END && today < NEXT_SCHOOL_YEAR_START) {
+  if (today >= VACATION_START && today < NEXT_SCHOOL_YEAR_START) {
     document.getElementById('vacation-label').textContent = 'Wakacje!';
     document.getElementById('vacation-days').textContent = '🏖';
     document.getElementById('vacation-unit').textContent = '';
-    document.getElementById('vacation-end-date').textContent = 'Koniec roku szkolnego: 26 czerwca 2026';
+    document.getElementById('vacation-end-date').textContent = 'Wakacje od: 26 czerwca 2026';
     document.getElementById('vacation-bar').style.width = '100%';
     return;
   }
 
-  const daysLeft = Math.max(0, calendarDaysBetween(today, SCHOOL_YEAR_END));
+  const daysLeft = Math.max(0, calendarDaysBetween(today, VACATION_START));
 
-  const yearLen = calendarDaysBetween(SCHOOL_YEAR_START, SCHOOL_YEAR_END);
+  const yearLen = calendarDaysBetween(SCHOOL_YEAR_START, VACATION_START);
   const elapsed = calendarDaysBetween(SCHOOL_YEAR_START, today);
   const pct = Math.min(100, Math.max(0, (elapsed / yearLen) * 100));
 
-  document.getElementById('vacation-label').textContent = 'Do końca roku szkolnego';
+  document.getElementById('vacation-label').textContent = 'Do wakacji';
   document.getElementById('vacation-days').textContent = daysLeft;
   document.getElementById('vacation-unit').textContent = daysLeft === 1 ? 'dzień' : 'dni';
-  document.getElementById('vacation-end-date').textContent = 'Koniec roku szkolnego: ' + SCHOOL_YEAR_END.toLocaleDateString('pl-PL', {
+  document.getElementById('vacation-end-date').textContent = 'Wakacje od: ' + VACATION_START.toLocaleDateString('pl-PL', {
     day: 'numeric',
     month: 'long',
     year: 'numeric'
@@ -667,11 +672,21 @@ function updateVacation() {
   document.getElementById('vacation-bar').style.width = pct.toFixed(1) + '%';
 }
 
+function scheduleMidnightVacationRefresh() {
+  const now = new Date();
+  const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  setTimeout(() => {
+    updateVacation();
+    scheduleMidnightVacationRefresh();
+  }, nextMidnight - now + 1000);
+}
+
 // ── INIT ──
 applyTweaks();
 updateClock();
 updateVacation();
 updateLucky();
+scheduleMidnightVacationRefresh();
 setInterval(() => { updateClock(); updateVacation(); }, 1000);
 </script>
 </body>
